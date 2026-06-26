@@ -189,7 +189,7 @@
     const el=document.createElement('div'); el.className='ncard'+(fresh?' fresh':'');
     el.innerHTML=`
       ${it.raw?`<div class="raw">${fmtMood(it.mood)}${esc(it.raw)}</div>`:''}
-      <div class="nch"><h3>${esc(it.title)}</h3><span class="tag" style="background:${cat.color}">${it.category}</span></div>
+      <div class="nch"><h3>${esc(it.title)}</h3><span class="tag" style="background:${cat.color};color:${FRICTION.textOn(cat.color)}">${it.category}</span></div>
       <div class="fix"><div class="k">◷ Suggested AI fix</div><p>${esc(it.aiIdea||'To be scoped.')}</p></div>
       <div class="ncfoot">
         <span class="by">${esc(it.who||'Anonymous')}</span>

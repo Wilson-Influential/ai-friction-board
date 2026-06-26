@@ -12,15 +12,34 @@ const FRICTION = (() => {
   const STORE_KEY = 'friction_v1';
 
   // Sector / type colours, pulled straight from the Influential palette.
+  // Kept visually distinct from each other; text colour is picked
+  // automatically (see textOn) so any colour stays legible.
   const CATEGORIES = {
-    'Onboarding':   { color: '#0b1ee4', tag: 'PR Blue' },
-    'PR workflow':  { color: '#5c68eb', tag: 'Pastel Blue' },
+    'Onboarding':   { color: '#efa33f', tag: 'Mustard Yellow' },
+    'PR workflow':  { color: '#0b1ee4', tag: 'PR Blue' },
     'Design':       { color: '#fe2458', tag: 'Insights Red' },
     'Repetition':   { color: '#ff7d3a', tag: 'Campaign Orange' },
     'Reporting':    { color: '#197319', tag: 'Forest Green' },
     'Admin':        { color: '#5f616d', tag: 'Charcoal' },
     'Other':        { color: '#201747', tag: 'Navy' }
   };
+
+  // Colour each pipeline stage gets, as a clean progression.
+  const STATUS_COLORS = {
+    'Raised':      '#5f616d',  // charcoal — just in
+    'Shortlisted': '#0b1ee4',  // blue — under consideration
+    'Building':    '#ff7d3a',  // orange — in progress
+    'Shipped':     '#197319'   // green — done
+  };
+
+  // Pick black or white text for a given background, by luminance.
+  // Lets the team add any brand colour without breaking readability.
+  function textOn(hex){
+    const c = hex.replace('#','');
+    const r = parseInt(c.slice(0,2),16), g = parseInt(c.slice(2,4),16), b = parseInt(c.slice(4,6),16);
+    const L = (0.299*r + 0.587*g + 0.114*b) / 255;
+    return L > 0.62 ? '#1a1430' : '#ffffff';
+  }
 
   const STATUSES = ['Raised', 'Shortlisted', 'Building', 'Shipped'];
 
@@ -131,5 +150,5 @@ const FRICTION = (() => {
 
   function newId() { return 'u' + Date.now().toString(36); }
 
-  return { CATEGORIES, STATUSES, SEED, load, save, score, newId, STORE_KEY };
+  return { CATEGORIES, STATUS_COLORS, STATUSES, SEED, load, save, score, newId, textOn, STORE_KEY };
 })();

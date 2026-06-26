@@ -206,7 +206,7 @@
         <div class="mid">
           <div class="ttl">${esc(it.title)}</div>
           <div class="meta">
-            <span class="tag" style="background:${cat.color}">${it.category}</span>
+            <span class="tag" style="background:${cat.color};color:${FRICTION.textOn(cat.color)}">${it.category}</span>
             <span class="pill">${esc(it.status)}</span>
             <span class="stat"><b>${fmtTime(it.minsPerWeek)}</b>/wk</span>
             <span class="stat">· ${esc(it.frequency)}</span>
@@ -239,7 +239,7 @@
   function openPanel(id){
     selId = id; const it = items.find(x=>x.id===id);
     const cat = FRICTION.CATEGORIES[it.category];
-    document.getElementById('pcat').innerHTML = `<span class="tag" style="background:${cat.color}">${it.category}</span>`;
+    document.getElementById('pcat').innerHTML = `<span class="tag" style="background:${cat.color};color:${FRICTION.textOn(cat.color)}">${it.category}</span>`;
     document.getElementById('ptitle').textContent = it.title;
     renderPanelStats(it);
     panel.classList.add('open'); render();
