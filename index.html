@@ -3,174 +3,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Friction — where the work snags</title>
+<title>Friction — what's slowing us down</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#201747; --white:#fff; --offwhite:#f4f2ee; --charcoal:#5f616d;
-    --red:#fe2458; --blue:#0b1ee4; --orange:#ff7d3a; --green:#197319; --yellow:#f1e63f;
-    --ink:#1a1430;
+    --navy:#201747; --white:#fff; --paper:#f4f2ee; --line:#e4e0d8;
+    --charcoal:#5f616d; --red:#fe2458; --ink:#1a1430; --green:#197319;
     --font:'Mulish','Segoe UI',system-ui,sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:var(--font); color:var(--white);
-    background:
-      radial-gradient(120% 90% at 12% -10%, #3a2470 0%, transparent 55%),
-      radial-gradient(120% 110% at 100% 0%, #2a1c5c 0%, transparent 50%),
-      var(--navy);
-    min-height:100vh; -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  }
-  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  body{font-family:var(--font);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 22px}
 
-  /* top bar */
-  header{display:flex;align-items:center;justify-content:space-between;padding:26px 0}
-  header img{height:26px;display:block}
-  .tagchip{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#b9add9;
-    border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:7px 14px}
+  /* full-bleed navy hero band (its own background, not a floating box) */
+  .herowrap{position:relative;overflow:hidden;
+    background:radial-gradient(120% 130% at 100% 0%, #33215f 0%, transparent 55%), var(--navy);
+    color:#fff}
+  .herowrap .ring{position:absolute;right:-120px;top:-130px;width:400px;height:400px;border-radius:50%;
+    border:74px solid rgba(255,255,255,.05);pointer-events:none}
+  .heroinner{max-width:1200px;margin:0 auto;padding:30px 22px 38px;position:relative;z-index:1}
+  .brand img{height:30px;display:block;margin-bottom:30px}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#cdbff2;font-weight:800;margin-bottom:13px}
+  .herowrap h1{font-size:clamp(38px,6vw,64px);font-weight:900;letter-spacing:-.03em;line-height:.96}
+  .herosub{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:18px}
+  .herosub p{font-size:16px;font-weight:300;color:#d7cff0;max-width:470px;line-height:1.55}
+  .herosub p b{color:#fff;font-weight:700}
+  /* rank toggle, styled for the navy hero */
+  .sorts{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+    border-radius:100px;padding:4px;flex:none}
+  .sorts button{border:0;background:transparent;font-family:inherit;font-weight:700;font-size:13px;color:#cdbff2;
+    padding:9px 16px;border-radius:100px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .sorts button.on{background:#fff;color:var(--navy)}
 
-  /* hero */
-  .hero{padding:46px 0 30px;position:relative}
-  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.18em;
-    text-transform:uppercase;color:#cdbff2;margin-bottom:22px}
-  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--red);
-    box-shadow:0 0 0 0 rgba(254,36,88,.6);animation:pulse 2.4s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(254,36,88,.55)}70%{box-shadow:0 0 0 12px rgba(254,36,88,0)}100%{box-shadow:0 0 0 0 rgba(254,36,88,0)}}
-  h1{font-weight:900;font-size:clamp(48px,9vw,104px);line-height:.92;letter-spacing:-.03em;margin-bottom:24px}
-  h1 .em{color:var(--red)}
-  .lede{font-size:clamp(17px,2.3vw,21px);font-weight:300;color:#d7cff0;max-width:600px;line-height:1.55}
-  .lede b{font-weight:700;color:#fff}
+  /* top priorities */
+  .toplabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--charcoal);font-weight:800;margin:30px 0 14px}
+  .top3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.top3{grid-template-columns:1fr}}
+  .t3{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;cursor:pointer;transition:.25s}
+  .t3:hover{box-shadow:0 16px 36px -24px rgba(32,23,71,.55);transform:translateY(-3px);border-color:#c8c2b6}
+  .t3 .rk{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--charcoal);display:flex;align-items:center;gap:8px}
+  .t3.one .rk .hash{color:var(--red)}
+  .t3 .rk .mood{font-size:14px}
+  .t3 h3{font-size:17px;font-weight:800;line-height:1.28;margin:9px 0 12px;letter-spacing:-.01em}
+  .t3 .r{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--charcoal);font-weight:700;flex-wrap:wrap}
+  .t3 .sc{background:var(--red);color:#fff;font-weight:900;font-size:12px;padding:3px 9px;border-radius:6px}
 
-  /* big ring motif, brand-true annulus bleeding off corner */
-  .ring{position:absolute;right:-160px;top:-40px;width:520px;height:520px;border-radius:50%;
-    border:88px solid rgba(255,255,255,.05);pointer-events:none}
-  .ring.b{right:60px;top:200px;width:180px;height:180px;border-width:30px;border-color:rgba(254,36,88,.16)}
+  /* board */
+  .boardhead{display:flex;align-items:center;justify-content:space-between;margin:36px 0 14px;flex-wrap:wrap;gap:12px}
+  .boardhead h2{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--charcoal);font-weight:800}
+  .addbtn{border:0;background:var(--navy);color:#fff;font-family:inherit;font-weight:800;font-size:14px;
+    padding:11px 19px;border-radius:100px;cursor:pointer;transition:.2s}
+  .addbtn:hover{filter:brightness(1.15);transform:translateY(-1px)}
 
-  /* the three takes */
-  .takes{padding:40px 0 30px}
-  .takes-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:26px;flex-wrap:wrap}
-  .takes-head h2{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#b9add9;font-weight:700}
-  .takes-head p{font-size:14px;color:var(--charcoal);color:#9a8fc0}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:70px;align-items:start}
+  @media(max-width:920px){.board{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.board{grid-template-columns:1fr}}
+  .col{background:rgba(255,255,255,.5);border:1px solid var(--line);border-radius:18px;padding:12px;min-height:120px;transition:.2s}
+  .col.drop{border-color:var(--navy);background:#fff;box-shadow:0 0 0 2px rgba(32,23,71,.15) inset}
+  .colhead{display:flex;align-items:center;gap:9px;padding:6px 8px 13px}
+  /* single-colour (navy) stage dot, fill grows hollow -> solid to show progression */
+  .colhead .dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--navy);flex:none;position:relative}
+  .colhead .dot::after{content:"";position:absolute;inset:1px;border-radius:50%;background:var(--navy);transform:scale(var(--fill,0));transition:.2s}
+  .colhead .nm{font-size:13px;font-weight:900;letter-spacing:.02em;color:var(--navy)}
+  .colhead .ct{font-size:12px;font-weight:800;color:var(--charcoal);background:var(--paper);border:1px solid var(--line);
+    border-radius:100px;min-width:24px;text-align:center;padding:2px 7px;margin-left:auto}
 
-  .card{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
-    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
-    border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:26px 24px 24px;overflow:hidden;
-    transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,box-shadow .35s}
-  .card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28);
-    box-shadow:0 26px 50px -24px rgba(0,0,0,.7)}
-  .card .num{font-size:13px;font-weight:800;letter-spacing:.1em;opacity:.55}
-  .card .cring{position:absolute;right:-34px;top:-34px;width:120px;height:120px;border-radius:50%;
-    border:22px solid var(--accent);opacity:.22;transition:opacity .35s,transform .35s}
-  .card:hover .cring{opacity:.4;transform:scale(1.08)}
-  .card h3{font-size:27px;font-weight:800;letter-spacing:-.02em;margin:50px 0 10px}
-  .card .role{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
-    font-weight:700;margin-bottom:14px;filter:brightness(1.5)}
-  .card p{font-size:15px;font-weight:300;line-height:1.55;color:#d7cff0;flex:1}
-  .card .go{margin-top:22px;display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
-  .card .go .arrow{transition:transform .35s}
-  .card:hover .go .arrow{transform:translateX(6px)}
+  .fc{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 13px 11px;margin-bottom:10px;transition:.18s;cursor:pointer}
+  .fc:hover{border-color:#c8c2b6;box-shadow:0 10px 24px -18px rgba(32,23,71,.6)}
+  .fc.sel{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy)}
+  .fc.dragging{opacity:.4}
+  .fc .toprow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+  .fc .ftag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px;display:inline-block}
+  .fc .mood{font-size:15px;line-height:1}
+  .fc h4{font-size:14.5px;font-weight:800;line-height:1.3;letter-spacing:-.01em}
+  .fc .ship{font-size:11px;font-weight:800;color:var(--green);margin-top:9px;display:flex;align-items:center;gap:5px}
+  .fc .who{font-size:11px;color:var(--charcoal);font-weight:700;margin-top:10px}
+  .fc .fb{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+  .mover{display:inline-flex;gap:5px}
+  .mover button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--paper);
+    cursor:pointer;font-size:14px;font-weight:900;color:var(--navy);line-height:1;transition:.18s;display:grid;place-items:center;font-family:inherit}
+  .mover button:hover:not(:disabled){border-color:var(--navy);background:#fff;transform:translateY(-1px)}
+  .mover button:disabled{opacity:.32;cursor:default}
+  .vote{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border:1px solid var(--line);
+    border-radius:100px;padding:6px 12px;cursor:pointer;transition:.2s;font-family:inherit}
+  .vote:hover{border-color:var(--red)}
+  .vote.voted{background:rgba(254,36,88,.1);border-color:var(--red)}
+  .vote .up{color:var(--red);font-size:11px}
+  .vote .n{font-weight:900;font-size:14px}
+  .bump{animation:bmp .35s ease}@keyframes bmp{40%{transform:scale(1.3)}100%{transform:scale(1)}}
 
-  .card.a{--accent:#0b1ee4}
-  .card.b{--accent:#fe2458}
-  .card.c{--accent:#ff7d3a}
+  /* detail panel (non-modal, no blur, click another card to swap) */
+  .panel{position:fixed;top:0;right:0;height:100vh;width:min(430px,92vw);background:#fff;border-left:1px solid var(--line);
+    box-shadow:-30px 0 60px -30px rgba(32,23,71,.35);transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    z-index:40;display:flex;flex-direction:column;overflow-y:auto}
+  .panel.open{transform:none}
+  .panel .ph{padding:22px 24px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+  .panel .x{position:absolute;top:18px;right:18px;border:1px solid var(--line);background:#fff;width:34px;height:34px;
+    border-radius:50%;cursor:pointer;font-size:17px;color:var(--charcoal);line-height:1}
+  .panel .x:hover{border-color:var(--navy);color:var(--navy)}
+  .panel h2{font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:14px 40px 0 0}
+  .panel .pbody{padding:22px 24px 50px}
+  .panel .pbody p.det{font-size:15px;font-weight:300;line-height:1.6;color:#3a3450}
+  .ftag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+  .stbox{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .stbox .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--charcoal);font-weight:700}
+  .stbox .v{font-size:18px;font-weight:900;margin-top:4px;letter-spacing:-.02em}
+  .aibox{background:linear-gradient(120deg, rgba(11,30,228,.07), rgba(254,36,88,.06));border:1px solid var(--line);
+    border-radius:14px;padding:16px}
+  .aibox .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-weight:800;display:flex;align-items:center;gap:7px}
+  .aibox p{font-size:14.5px;font-weight:400;line-height:1.55;margin-top:8px;color:var(--ink)}
+  .pstatus{margin-top:22px}
+  .pstatus .lab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--charcoal);font-weight:700;margin-bottom:9px}
+  .statusrow{display:flex;gap:6px;flex-wrap:wrap}
+  .stbtn{flex:1;min-width:70px;border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:700;font-size:12px;
+    color:var(--charcoal);padding:9px 6px;border-radius:9px;cursor:pointer;transition:.2s}
+  .stbtn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 
-  /* why strip */
-  .why{margin:34px 0 60px;padding:30px 28px;border-radius:22px;
-    background:linear-gradient(120deg, rgba(254,36,88,.14), rgba(11,30,228,.12));
-    border:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:26px}
-  @media(max-width:760px){.why{grid-template-columns:1fr;gap:18px}}
-  .why h4{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#cdbff2;margin-bottom:9px}
-  .why p{font-size:14.5px;font-weight:300;line-height:1.55;color:#e7e1f5}
-  .why b{font-weight:700;color:#fff}
-
-  footer{padding:30px 0 50px;border-top:1px solid rgba(255,255,255,.08);
-    display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-  footer p{font-size:13px;color:#8c7fb4;font-weight:300;line-height:1.5}
-  footer img{height:18px;opacity:.85}
-
-  .reveal{opacity:0;transform:translateY(18px);animation:rise .8s cubic-bezier(.2,.8,.2,1) forwards}
-  @keyframes rise{to{opacity:1;transform:none}}
-  .d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}
-  .d4{animation-delay:.29s}.d5{animation-delay:.37s}.d6{animation-delay:.45s}
+  /* composer */
+  .scrim{position:fixed;inset:0;background:rgba(26,20,48,.4);opacity:0;pointer-events:none;transition:.3s;z-index:50}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .compose{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);width:min(520px,94vw);
+    background:#fff;border-radius:22px;padding:26px;z-index:51;opacity:0;pointer-events:none;transition:.3s;
+    box-shadow:0 40px 80px -30px rgba(32,23,71,.6);max-height:90vh;overflow-y:auto}
+  .compose.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .compose h3{font-size:22px;font-weight:900;letter-spacing:-.02em}
+  .compose .sub{font-size:13px;color:var(--charcoal);font-weight:300;margin-top:5px}
+  label{display:block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--charcoal);margin:16px 0 6px}
+  input,textarea,select{width:100%;font-family:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;
+    padding:11px 12px;background:var(--paper);color:var(--ink);outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--navy);background:#fff}
+  textarea{min-height:70px;resize:vertical;line-height:1.5}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .moods{display:flex;gap:8px;flex-wrap:wrap}
+  .moods .m{font-size:19px;width:42px;height:42px;border-radius:11px;border:1px solid var(--line);background:var(--paper);
+    cursor:pointer;transition:.2s;display:grid;place-items:center}
+  .moods .m:hover{transform:translateY(-2px)}
+  .moods .m.on{border-color:var(--red);background:rgba(254,36,88,.1);transform:scale(1.05)}
+  .cact{display:flex;gap:10px;margin-top:22px}
+  .cact .save{flex:1;border:0;background:var(--navy);color:#fff;font-family:inherit;font-weight:800;font-size:15px;padding:13px;border-radius:12px;cursor:pointer}
+  .cact .cancel{border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:700;color:var(--charcoal);padding:13px 18px;border-radius:12px;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="ring"></div><div class="ring b"></div>
+
+<section class="herowrap">
+  <div class="ring"></div>
+  <div class="heroinner">
+    <div class="brand"><img src="assets/inf-white.png" alt="Influential"></div>
+    <div class="kicker">Monthly AI Forum</div>
+    <h1>What's slowing us down.</h1>
+    <div class="herosub">
+      <p>One shared list, ranked by impact, so we fix the things that <b>free the most time</b> instead of attacking problems at random.</p>
+      <div class="sorts" id="sorts">
+        <button data-sort="score" class="on">Opportunity</button>
+        <button data-sort="votes">Most felt</button>
+        <button data-sort="time">Time lost</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="wrap">
+  <div class="toplabel">Top priorities right now</div>
+  <div class="top3" id="top3"></div>
 
-  <header class="reveal d1">
-    <img src="assets/inf-white.png" alt="Influential">
-    <span class="tagchip">Internal · AI opportunities</span>
-  </header>
-
-  <section class="hero">
-    <div class="eyebrow reveal d1"><span class="dot"></span> Built from the directors meeting · 26 Jun</div>
-    <h1 class="reveal d2">Where the<br>work <span class="em">snags</span>.</h1>
-    <p class="lede reveal d3">One place to surface the things that slow us down. The repeated jobs, the clunky steps, the bits everyone quietly hates. They rank themselves by <b>time lost</b> and <b>how many of us feel it</b>, and the top ones become the next thing AI takes off our plate.</p>
-  </section>
-
-  <section class="takes">
-    <div class="takes-head reveal d3">
-      <h2>Three ways to do it</h2>
-      <p>Same shared list underneath. Pick the feel that fits the room.</p>
-    </div>
-    <div class="grid">
-
-      <a class="card a reveal d4" href="log.html">
-        <div class="cring"></div>
-        <div class="num">01</div>
-        <div class="role">The clean tool</div>
-        <h3>Friction Log</h3>
-        <p>A calm, Notion-style board. Log a snag, say how often it bites and roughly how long it costs, vote on others. It sorts itself into an opportunity ranking. The serious internal-tool take.</p>
-        <span class="go">Open the Log <span class="arrow">→</span></span>
-      </a>
-
-      <a class="card b reveal d5" href="vent.html">
-        <div class="cring"></div>
-        <div class="num">02</div>
-        <div class="role">The low-barrier one</div>
-        <h3>Off Your Chest</h3>
-        <p>Just type the rant, get it off your chest. It quietly turns your words into a tidy card with a suggested AI fix. Lowest effort to contribute, a bit cathartic. Best for getting people to actually post.</p>
-        <span class="go">Have a vent <span class="arrow">→</span></span>
-      </a>
-
-      <a class="card c reveal d6" href="forum.html">
-        <div class="cring"></div>
-        <div class="num">03</div>
-        <div class="role">The meeting engine</div>
-        <h3>The Forum</h3>
-        <p>Built around Sarah's monthly forum. Raised → Shortlisted → Building → Shipped, with this month's top three up top and the wins we've already shipped. The take that runs the meeting.</p>
-        <span class="go">Open the Forum <span class="arrow">→</span></span>
-      </a>
-
-    </div>
-  </section>
-
-  <section class="why reveal d6">
-    <div>
-      <h4>What Sarah asked for</h4>
-      <p>A <b>monthly forum to prioritise AI opportunities</b>, working from one shared list instead of attacking problems at random. This is that list, made live.</p>
-    </div>
-    <div>
-      <h4>Why it ranks itself</h4>
-      <p>Top of the board = <b>real time lost × how many people feel it</b>. So we build the thing that frees the most hours, not just the loudest one.</p>
-    </div>
-    <div>
-      <h4>Seeded, not empty</h4>
-      <p>It opens with the snags from the meeting already in: onboarding, PR time logging, deck edits. The deck studio is already marked <b>Building</b>.</p>
-    </div>
-  </section>
-
-  <footer class="reveal d6">
-    <p>Prototype. Votes save in your browser for now; the team version would share one live board.<br>A pick for you to react to, not a finished decision.</p>
-    <img src="assets/inf-white.png" alt="Influential">
-  </footer>
-
+  <div class="boardhead">
+    <h2>The pipeline</h2>
+    <button class="addbtn" id="addBtn">＋ Raise a friction point</button>
+  </div>
+  <div class="board" id="board"></div>
 </div>
+
+<aside class="panel" id="panel">
+  <div class="ph"><button class="x" id="px">×</button><div id="pcat"></div><h2 id="ptitle"></h2></div>
+  <div class="pbody" id="pbody"></div>
+</aside>
+
+<div class="scrim" id="scrim"></div>
+<div class="compose" id="compose">
+  <h3>Raise a friction point</h3>
+  <p class="sub">It lands in Raised. Move it along with the ‹ › arrows as the forum decides.</p>
+  <label>The snag</label>
+  <input id="f_title" placeholder="e.g. Pitch case studies reformatted by hand every time">
+  <label>A bit more (optional)</label>
+  <textarea id="f_detail"></textarea>
+  <div class="twocol">
+    <div><label>Type</label><select id="f_cat"></select></div>
+    <div><label>Minutes / week</label><input id="f_mins" type="number" value="60" min="0" step="15"></div>
+  </div>
+  <label>How does it feel? (optional)</label>
+  <div class="moods" id="moods">
+    <div class="m" data-mood="😤" title="Frustrating">😤</div>
+    <div class="m" data-mood="😩" title="Draining">😩</div>
+    <div class="m" data-mood="🔁" title="Repetitive">🔁</div>
+    <div class="m" data-mood="🐌" title="Slow">🐌</div>
+    <div class="m" data-mood="🙃" title="Silly">🙃</div>
+  </div>
+  <label>Your name (optional)</label>
+  <input id="f_who" placeholder="Anonymous">
+  <div class="cact"><button class="save" id="f_save">Add to board</button><button class="cancel" id="f_cancel">Cancel</button></div>
+</div>
+
+<script src="assets/data.js"></script>
+<script>
+  let items=FRICTION.load();
+  let sort='score';
+  let mood='';
+  let selId=null;
+  const votedKey='friction_voted_v1';
+  let voted=new Set(JSON.parse(localStorage.getItem(votedKey)||'[]'));
+  const fmtTime=m=>m>=60?(m/60%1===0?(m/60)+'h':(m/60).toFixed(1)+'h'):m+'m';
+  const sortVal=(it)=> sort==='votes'?it.votes : sort==='time'?it.minsPerWeek : FRICTION.score(it);
+
+  const board=document.getElementById('board'), top3=document.getElementById('top3');
+
+  function renderTop3(){
+    const arr=[...items].filter(i=>i.status!=='Shipped').sort((a,b)=>sortVal(b)-sortVal(a)).slice(0,3);
+    top3.innerHTML='';
+    arr.forEach((it,i)=>{
+      const el=document.createElement('div');el.className='t3'+(i===0?' one':'');
+      el.innerHTML=`<div class="rk"><span class="hash">#${i+1} priority</span>${it.mood?`<span class="mood">${it.mood}</span>`:''}</div>
+        <h3>${esc(it.title)}</h3>
+        <div class="r"><span class="sc">${FRICTION.score(it)}</span><span>${it.votes} feel it</span><span>· ${fmtTime(it.minsPerWeek)}/wk</span></div>`;
+      el.addEventListener('click',()=>openPanel(it.id));
+      top3.appendChild(el);
+    });
+  }
+
+  function renderBoard(){
+    board.innerHTML='';
+    FRICTION.STATUSES.forEach((st,si)=>{
+      const col=document.createElement('div');
+      col.className='col '+st.toLowerCase(); col.dataset.status=st;
+      const inCol=[...items].filter(i=>i.status===st).sort((a,b)=>sortVal(b)-sortVal(a));
+      const fill=(si/(FRICTION.STATUSES.length-1)).toFixed(2);   // 0 -> 1 across stages
+      col.innerHTML=`<div class="colhead"><span class="dot" style="--fill:${fill}"></span>
+        <span class="nm">${st}</span><span class="ct">${inCol.length}</span></div>`;
+      inCol.forEach(it=>col.appendChild(fcard(it)));
+      col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('drop');});
+      col.addEventListener('dragleave',()=>col.classList.remove('drop'));
+      col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drop');move(e.dataTransfer.getData('id'),st);});
+      board.appendChild(col);
+    });
+  }
+
+  function fcard(it){
+    const cat=FRICTION.CATEGORIES[it.category]||FRICTION.CATEGORIES.Other;
+    const idx=FRICTION.STATUSES.indexOf(it.status);
+    const el=document.createElement('div'); el.className='fc'+(it.id===selId?' sel':''); el.draggable=true;
+    el.innerHTML=`
+      <div class="toprow">
+        <span class="ftag" style="background:${cat.color};color:${FRICTION.textOn(cat.color)}">${it.category}</span>
+        ${it.mood?`<span class="mood">${it.mood}</span>`:''}
+      </div>
+      <h4>${esc(it.title)}</h4>
+      ${it.status==='Shipped'?`<div class="ship">✓ Shipped${it.aiIdea?' · '+esc(shortFix(it.aiIdea)):''}</div>`:''}
+      <div class="who">${esc(it.who||'Anon')} · ${fmtTime(it.minsPerWeek)}/wk</div>
+      <div class="fb">
+        <span class="mover">
+          <button data-prev ${idx<=0?'disabled':''} title="Move back" aria-label="Move back">‹</button>
+          <button data-next ${idx>=FRICTION.STATUSES.length-1?'disabled':''} title="Move forward" aria-label="Move forward">›</button>
+        </span>
+        <button class="vote ${voted.has(it.id)?'voted':''}" data-vote="${it.id}">
+          <span class="up">▲</span><span class="n" id="fn_${it.id}">${it.votes}</span>
+        </button>
+      </div>`;
+    el.addEventListener('click',e=>{ if(e.target.closest('button')) return; openPanel(it.id); });
+    el.addEventListener('dragstart',e=>{e.dataTransfer.setData('id',it.id);el.classList.add('dragging');});
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    el.querySelector('[data-vote]').addEventListener('click',e=>{e.stopPropagation();vote(it.id);});
+    el.querySelector('[data-prev]').addEventListener('click',e=>{e.stopPropagation();shift(it.id,-1);});
+    el.querySelector('[data-next]').addEventListener('click',e=>{e.stopPropagation();shift(it.id,1);});
+    return el;
+  }
+  function shortFix(s){return s.length>42?s.slice(0,39).trim()+'…':s;}
+
+  /* detail panel */
+  const panel=document.getElementById('panel');
+  function openPanel(id){
+    selId=id; const it=items.find(x=>x.id===id); if(!it)return;
+    const cat=FRICTION.CATEGORIES[it.category]||FRICTION.CATEGORIES.Other;
+    document.getElementById('pcat').innerHTML=`<span class="ftag" style="background:${cat.color};color:${FRICTION.textOn(cat.color)}">${it.category}</span>`;
+    document.getElementById('ptitle').textContent=it.title;
+    renderPanel(it); panel.classList.add('open'); renderBoard();
+  }
+  function renderPanel(it){
+    document.getElementById('pbody').innerHTML=`
+      <p class="det">${esc(it.detail||'No extra detail added.')}</p>
+      <div class="grid2">
+        <div class="stbox"><div class="k">Opportunity</div><div class="v" style="color:var(--red)">${FRICTION.score(it)}</div></div>
+        <div class="stbox"><div class="k">People feel it</div><div class="v">${it.votes}</div></div>
+        <div class="stbox"><div class="k">Time / week</div><div class="v">${fmtTime(it.minsPerWeek)}</div></div>
+        <div class="stbox"><div class="k">Raised by</div><div class="v" style="font-size:15px">${esc(it.who||'Anonymous')}</div></div>
+      </div>
+      <div class="aibox"><div class="k">◷ Possible AI fix</div><p>${esc(it.aiIdea||'Not scoped yet. Good one to talk through at the forum.')}</p></div>
+      <div class="pstatus"><div class="lab">Stage</div><div class="statusrow" id="statusrow"></div></div>`;
+    const sr=document.getElementById('statusrow');
+    FRICTION.STATUSES.forEach(s=>{
+      const b=document.createElement('button'); b.className='stbtn'+(s===it.status?' on':''); b.textContent=s;
+      b.onclick=()=>{ it.status=s; FRICTION.save(items); renderPanel(it); renderTop3(); renderBoard(); };
+      sr.appendChild(b);
+    });
+  }
+  document.getElementById('px').onclick=()=>{ panel.classList.remove('open'); selId=null; renderBoard(); };
+
+  function shift(id,dir){
+    const it=items.find(x=>x.id===id); if(!it)return;
+    const i=FRICTION.STATUSES.indexOf(it.status)+dir;
+    if(i<0||i>=FRICTION.STATUSES.length) return;
+    it.status=FRICTION.STATUSES[i]; FRICTION.save(items);
+    if(selId===id) renderPanel(it);
+    renderTop3(); renderBoard();
+  }
+  function move(id,status){const it=items.find(x=>x.id===id); if(it){it.status=status;FRICTION.save(items);if(selId===id)renderPanel(it);renderTop3();renderBoard();}}
+
+  function vote(id){
+    const it=items.find(x=>x.id===id); if(!it)return;
+    if(voted.has(id)){it.votes--;voted.delete(id);}else{it.votes++;voted.add(id);}
+    FRICTION.save(items);localStorage.setItem(votedKey,JSON.stringify([...voted]));
+    const n=document.getElementById('fn_'+id);
+    if(n){n.textContent=it.votes;n.classList.remove('bump');void n.offsetWidth;n.classList.add('bump');}
+    document.querySelector(`[data-vote="${id}"]`)?.classList.toggle('voted',voted.has(id));
+    if(selId===id) renderPanel(it);
+    renderTop3(); setTimeout(renderBoard,260);
+  }
+
+  // rank toggle
+  document.getElementById('sorts').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    sort=b.dataset.sort; document.querySelectorAll('#sorts button').forEach(x=>x.classList.toggle('on',x===b));
+    renderTop3(); renderBoard();
+  });
+
+  // composer
+  const scrim=document.getElementById('scrim'),compose=document.getElementById('compose'),catSel=document.getElementById('f_cat');
+  Object.keys(FRICTION.CATEGORIES).forEach(c=>{const o=document.createElement('option');o.textContent=c;catSel.appendChild(o);});
+  document.getElementById('moods').addEventListener('click',e=>{
+    const m=e.target.closest('.m'); if(!m)return;
+    if(mood===m.dataset.mood){mood='';m.classList.remove('on');}
+    else{mood=m.dataset.mood;document.querySelectorAll('#moods .m').forEach(x=>x.classList.toggle('on',x===m));}
+  });
+  const openC=()=>{scrim.classList.add('show');compose.classList.add('show');document.getElementById('f_title').focus();};
+  const closeC=()=>{scrim.classList.remove('show');compose.classList.remove('show');};
+  document.getElementById('addBtn').onclick=openC;document.getElementById('f_cancel').onclick=closeC;scrim.onclick=closeC;
+  document.getElementById('f_save').onclick=()=>{
+    const t=document.getElementById('f_title').value.trim();if(!t){document.getElementById('f_title').focus();return;}
+    const it={id:FRICTION.newId(),title:t,detail:document.getElementById('f_detail').value.trim(),
+      category:catSel.value,who:document.getElementById('f_who').value.trim()||'Anonymous',
+      minsPerWeek:parseInt(document.getElementById('f_mins').value)||30,frequency:'Raised at forum',
+      mood:mood,votes:1,status:'Raised',aiIdea:''};
+    items.push(it);voted.add(it.id);localStorage.setItem(votedKey,JSON.stringify([...voted]));FRICTION.save(items);
+    ['f_title','f_detail','f_who'].forEach(id=>document.getElementById(id).value='');document.getElementById('f_mins').value=60;
+    mood='';document.querySelectorAll('#moods .m').forEach(x=>x.classList.remove('on'));
+    closeC();renderTop3();renderBoard();
+  };
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeC();panel.classList.remove('open');selId=null;renderBoard();}});
+
+  function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  renderTop3(); renderBoard();
+</script>
 </body>
 </html>
