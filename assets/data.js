@@ -149,6 +149,12 @@ const FRICTION = (() => {
     try { localStorage.setItem(DEL_KEY, JSON.stringify([...d])); } catch (e) {}
   }
 
+  // Reverse a delete (for Undo).
+  function undelete(id) {
+    const d = loadDeleted(); d.delete(id);
+    try { localStorage.setItem(DEL_KEY, JSON.stringify([...d])); } catch (e) {}
+  }
+
   function save(list) {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) {}
   }
@@ -164,5 +170,5 @@ const FRICTION = (() => {
 
   function newId() { return 'u' + Date.now().toString(36); }
 
-  return { CATEGORIES, STATUS_COLORS, STATUSES, SEED, load, save, remove, score, newId, textOn, STORE_KEY };
+  return { CATEGORIES, STATUS_COLORS, STATUSES, SEED, load, save, remove, undelete, score, newId, textOn, STORE_KEY };
 })();

@@ -130,6 +130,17 @@
     font-family:inherit;font-weight:700;font-size:13px;padding:11px;border-radius:10px;cursor:pointer;transition:.2s}
   .delbtn:hover{border-color:var(--red);color:var(--red);background:rgba(254,36,88,.04)}
 
+  /* undo toast (replaces the native confirm popup) */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--navy);color:#fff;border-radius:100px;padding:11px 11px 11px 20px;display:flex;align-items:center;gap:16px;
+    box-shadow:0 18px 44px -16px rgba(0,0,0,.55);z-index:60;transition:opacity .3s, transform .3s cubic-bezier(.2,.8,.2,1);
+    font-size:14px;font-weight:600;max-width:90vw}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .toast span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .toast button{flex:none;border:0;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-weight:800;font-size:13px;
+    padding:8px 15px;border-radius:100px;cursor:pointer;transition:.2s}
+  .toast button:hover{background:rgba(255,255,255,.3)}
+
   /* composer */
   .scrim{position:fixed;inset:0;background:rgba(26,20,48,.4);opacity:0;pointer-events:none;transition:.3s;z-index:50}
   .scrim.show{opacity:1;pointer-events:auto}
@@ -185,6 +196,8 @@
   </div>
   <div class="board" id="board"></div>
 </div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 
 <aside class="panel" id="panel">
   <div class="ph"><button class="x" id="px">×</button><div id="pcat"></div><h2 id="ptitle"></h2></div>
@@ -318,11 +331,29 @@
       sr.appendChild(b);
     });
     document.getElementById('delBtn').onclick=()=>{
-      if(!confirm('Remove "'+it.title+'" from the board?')) return;
-      FRICTION.remove(it.id);
-      items=items.filter(x=>x.id!==it.id);
+      const removed=it;
+      FRICTION.remove(removed.id);
+      items=items.filter(x=>x.id!==removed.id);
       FRICTION.save(items);
       panel.classList.remove('open'); selId=null;
+      renderTop3(); renderBoard();
+      showRemovedToast(removed);
+    };
+  }
+
+  // instant remove, with a few seconds to undo (no blocking browser popup)
+  let toastTimer=null;
+  function showRemovedToast(item){
+    const t=document.getElementById('toast');
+    const short=item.title.length>34?item.title.slice(0,32)+'…':item.title;
+    document.getElementById('toastMsg').textContent='Removed “'+short+'”';
+    t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),5000);
+    document.getElementById('toastUndo').onclick=()=>{
+      FRICTION.undelete(item.id);
+      if(!items.some(x=>x.id===item.id)) items.push(item);
+      FRICTION.save(items);
+      t.classList.remove('show'); clearTimeout(toastTimer);
       renderTop3(); renderBoard();
     };
   }
