@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friction Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#201747; --white:#fff; --paper:#f4f2ee; --line:#e4e0d8;
+    --charcoal:#5f616d; --red:#fe2458; --ink:#1a1430;
+    --font:'Mulish','Segoe UI',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* top */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--line)}
+  .top img{height:22px}
+  .back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--charcoal);text-decoration:none;
+    border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:100px;transition:.2s}
+  .back:hover{border-color:var(--navy);color:var(--navy)}
+
+  header.hd{padding:34px 0 22px}
+  .kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);font-weight:800;margin-bottom:12px}
+  header.hd h1{font-size:clamp(34px,5vw,52px);font-weight:900;letter-spacing:-.025em;line-height:1}
+  header.hd p{margin-top:14px;font-size:16px;font-weight:300;color:var(--charcoal);max-width:580px;line-height:1.55}
+
+  /* toolbar */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 0 14px;flex-wrap:wrap}
+  .sorts{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:100px;padding:4px}
+  .sorts button{border:0;background:transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--charcoal);
+    padding:8px 15px;border-radius:100px;cursor:pointer;transition:.2s}
+  .sorts button.on{background:var(--navy);color:#fff}
+  .addbtn{border:0;background:var(--red);color:#fff;font-family:inherit;font-weight:800;font-size:14px;
+    padding:12px 20px;border-radius:100px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+  .addbtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+  /* layout */
+  .stage{display:grid;grid-template-columns:1fr;gap:0;padding-bottom:70px}
+  .list{display:flex;flex-direction:column;gap:10px}
+
+  /* row */
+  .row{display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:center;background:#fff;
+    border:1px solid var(--line);border-radius:16px;padding:16px 18px;cursor:pointer;transition:.22s}
+  .row:hover{border-color:#c8c2b6;box-shadow:0 12px 30px -20px rgba(32,23,71,.5)}
+  .row.sel{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy)}
+  .row.top{background:linear-gradient(100deg,#fff 60%, rgba(254,36,88,.07))}
+  .rank{display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .rank .score{font-size:24px;font-weight:900;letter-spacing:-.04em;line-height:1}
+  .rank .slab{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--charcoal);margin-top:3px}
+  .row.top .score{color:var(--red)}
+  .mid .ttl{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+  .meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .tag{font-size:11px;font-weight:800;letter-spacing:.02em;padding:4px 9px;border-radius:6px;color:#fff}
+  .pill{font-size:11px;font-weight:700;color:var(--charcoal);background:var(--paper);border:1px solid var(--line);
+    padding:4px 9px;border-radius:6px}
+  .stat{font-size:11px;font-weight:700;color:var(--charcoal)}
+  .stat b{color:var(--ink)}
+  /* vote */
+  .vote{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--paper);border:1px solid var(--line);
+    border-radius:12px;padding:9px 14px;min-width:58px;transition:.2s}
+  .vote:hover{border-color:var(--red)}
+  .vote.voted{background:rgba(254,36,88,.1);border-color:var(--red)}
+  .vote .up{font-size:15px;line-height:1;color:var(--red)}
+  .vote .n{font-size:19px;font-weight:900;letter-spacing:-.03em}
+  .vote .lbl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--charcoal)}
+  .bump{animation:bump .35s ease}
+  @keyframes bump{40%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+  /* detail panel (non-modal, slides over, board still visible behind by dimming only the strip) */
+  .panel{position:fixed;top:0;right:0;height:100vh;width:min(440px,92vw);background:#fff;border-left:1px solid var(--line);
+    box-shadow:-30px 0 60px -30px rgba(32,23,71,.35);transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    z-index:40;display:flex;flex-direction:column;overflow-y:auto}
+  .panel.open{transform:none}
+  .panel .ph{padding:22px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+  .panel .x{position:absolute;top:18px;right:18px;border:1px solid var(--line);background:#fff;width:34px;height:34px;
+    border-radius:50%;cursor:pointer;font-size:17px;color:var(--charcoal);line-height:1}
+  .panel .x:hover{border-color:var(--navy);color:var(--navy)}
+  .panel h2{font-size:23px;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:14px 40px 0 0}
+  .panel .pbody{padding:22px 24px 40px}
+  .panel .pbody p.det{font-size:15px;font-weight:300;line-height:1.6;color:#3a3450}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+  .stbox{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .stbox .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--charcoal);font-weight:700}
+  .stbox .v{font-size:18px;font-weight:900;margin-top:4px;letter-spacing:-.02em}
+  .aibox{background:linear-gradient(120deg, rgba(11,30,228,.07), rgba(254,36,88,.06));border:1px solid var(--line);
+    border-radius:14px;padding:16px 16px}
+  .aibox .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-weight:800;display:flex;align-items:center;gap:7px}
+  .aibox p{font-size:14.5px;font-weight:400;line-height:1.55;margin-top:8px;color:var(--ink)}
+  .statusrow{display:flex;gap:6px;margin-top:20px;flex-wrap:wrap}
+  .stbtn{flex:1;min-width:70px;border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:700;font-size:12px;
+    color:var(--charcoal);padding:9px 6px;border-radius:9px;cursor:pointer;transition:.2s}
+  .stbtn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  /* composer */
+  .scrim{position:fixed;inset:0;background:rgba(26,20,48,.4);opacity:0;pointer-events:none;transition:.3s;z-index:50}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .compose{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);width:min(540px,94vw);
+    background:#fff;border-radius:22px;padding:28px;z-index:51;opacity:0;pointer-events:none;transition:.3s;
+    box-shadow:0 40px 80px -30px rgba(32,23,71,.6);max-height:90vh;overflow-y:auto}
+  .compose.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .compose h3{font-size:24px;font-weight:900;letter-spacing:-.02em}
+  .compose .sub{font-size:14px;color:var(--charcoal);font-weight:300;margin-top:6px}
+  label{display:block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--charcoal);margin:18px 0 7px}
+  input,textarea,select{width:100%;font-family:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;
+    padding:12px 13px;background:var(--paper);color:var(--ink);outline:none;transition:.2s}
+  input:focus,textarea:focus,select:focus{border-color:var(--navy);background:#fff}
+  textarea{min-height:84px;resize:vertical;line-height:1.5}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cact{display:flex;gap:10px;margin-top:24px}
+  .cact .save{flex:1;border:0;background:var(--red);color:#fff;font-family:inherit;font-weight:800;font-size:15px;
+    padding:14px;border-radius:12px;cursor:pointer}
+  .cact .save:hover{filter:brightness(1.08)}
+  .cact .cancel{border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:700;color:var(--charcoal);
+    padding:14px 20px;border-radius:12px;cursor:pointer}
+  .hint{font-size:12px;color:var(--charcoal);margin-top:7px;font-weight:300}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img src="assets/inf-navy.png" alt="Influential">
+    <a class="back" href="index.html">← all three takes</a>
+  </div>
+
+  <header class="hd">
+    <div class="kicker">Friction Log</div>
+    <h1>What's slowing us down.</h1>
+    <p>Log a snag, vote on the ones you feel too. It ranks itself by time lost and how many of us it bites, so the top of the board is the next best thing to fix.</p>
+  </header>
+
+  <div class="bar">
+    <div class="sorts" id="sorts">
+      <button data-sort="score" class="on">Opportunity</button>
+      <button data-sort="votes">Most felt</button>
+      <button data-sort="time">Time lost</button>
+    </div>
+    <button class="addbtn" id="addBtn">＋ Add friction</button>
+  </div>
+
+  <div class="stage"><div class="list" id="list"></div></div>
+</div>
+
+<!-- detail panel -->
+<aside class="panel" id="panel">
+  <div class="ph"><button class="x" id="px">×</button><div id="pcat"></div><h2 id="ptitle"></h2></div>
+  <div class="pbody" id="pbody"></div>
+</aside>
+
+<!-- composer -->
+<div class="scrim" id="scrim"></div>
+<div class="compose" id="compose">
+  <h3>Add a friction point</h3>
+  <p class="sub">Keep it about the work, not the people. The snag, not the blame.</p>
+  <label>The snag, in a line</label>
+  <input id="f_title" placeholder="e.g. Reformatting case studies for every pitch">
+  <label>A bit more (optional)</label>
+  <textarea id="f_detail" placeholder="What happens, why it drags."></textarea>
+  <div class="twocol">
+    <div><label>Type</label><select id="f_cat"></select></div>
+    <div><label>How often</label>
+      <select id="f_freq"><option>Daily</option><option selected>Weekly</option><option>Most projects</option><option>Every new client</option><option>Monthly</option></select></div>
+  </div>
+  <div class="twocol">
+    <div><label>Minutes it costs / week</label><input id="f_mins" type="number" value="60" min="0" step="15"></div>
+    <div><label>Your name (optional)</label><input id="f_who" placeholder="Anonymous"></div>
+  </div>
+  <p class="hint">A rough estimate is fine. It only nudges the ranking.</p>
+  <div class="cact"><button class="save" id="f_save">Add to the board</button><button class="cancel" id="f_cancel">Cancel</button></div>
+</div>
+
+<script src="assets/data.js"></script>
+<script>
+  let items = FRICTION.load();
+  let sort = 'score';
+  let selId = null;
+  const votedKey = 'friction_voted_v1';
+  let voted = new Set(JSON.parse(localStorage.getItem(votedKey) || '[]'));
+
+  const list = document.getElementById('list');
+  const fmtTime = m => m >= 60 ? (m/60 % 1 === 0 ? (m/60)+'h' : (m/60).toFixed(1)+'h') : m+'m';
+
+  function sorted(){
+    const a = [...items];
+    if(sort==='score') a.sort((x,y)=>FRICTION.score(y)-FRICTION.score(x));
+    if(sort==='votes') a.sort((x,y)=>y.votes-x.votes);
+    if(sort==='time') a.sort((x,y)=>y.minsPerWeek-x.minsPerWeek);
+    return a;
+  }
+
+  function render(){
+    const arr = sorted();
+    list.innerHTML = '';
+    arr.forEach((it,i)=>{
+      const cat = FRICTION.CATEGORIES[it.category] || FRICTION.CATEGORIES.Other;
+      const isTop = sort==='score' && i===0;
+      const el = document.createElement('div');
+      el.className = 'row'+(isTop?' top':'')+(it.id===selId?' sel':'');
+      el.innerHTML = `
+        <div class="rank"><div class="score">${FRICTION.score(it)}</div><div class="slab">score</div></div>
+        <div class="mid">
+          <div class="ttl">${esc(it.title)}</div>
+          <div class="meta">
+            <span class="tag" style="background:${cat.color}">${it.category}</span>
+            <span class="pill">${esc(it.status)}</span>
+            <span class="stat"><b>${fmtTime(it.minsPerWeek)}</b>/wk</span>
+            <span class="stat">· ${esc(it.frequency)}</span>
+          </div>
+        </div>
+        <button class="vote ${voted.has(it.id)?'voted':''}" data-vote="${it.id}">
+          <span class="up">▲</span><span class="n" id="n_${it.id}">${it.votes}</span><span class="lbl">felt</span>
+        </button>`;
+      el.addEventListener('click', e=>{ if(e.target.closest('[data-vote]')) return; openPanel(it.id); });
+      list.appendChild(el);
+    });
+    document.querySelectorAll('[data-vote]').forEach(b=>b.addEventListener('click', e=>{e.stopPropagation();vote(b.dataset.vote);}));
+  }
+
+  function vote(id){
+    const it = items.find(x=>x.id===id); if(!it) return;
+    if(voted.has(id)){ it.votes--; voted.delete(id); }
+    else { it.votes++; voted.add(id); }
+    FRICTION.save(items); localStorage.setItem(votedKey, JSON.stringify([...voted]));
+    const n = document.getElementById('n_'+id);
+    if(n){ n.textContent = it.votes; n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); }
+    document.querySelector(`[data-vote="${id}"]`).classList.toggle('voted', voted.has(id));
+    if(selId) renderPanelStats(it);
+    // re-rank live if sorting by something vote-affected
+    setTimeout(render, 280);
+  }
+
+  /* panel */
+  const panel = document.getElementById('panel');
+  function openPanel(id){
+    selId = id; const it = items.find(x=>x.id===id);
+    const cat = FRICTION.CATEGORIES[it.category];
+    document.getElementById('pcat').innerHTML = `<span class="tag" style="background:${cat.color}">${it.category}</span>`;
+    document.getElementById('ptitle').textContent = it.title;
+    renderPanelStats(it);
+    panel.classList.add('open'); render();
+  }
+  function renderPanelStats(it){
+    document.getElementById('pbody').innerHTML = `
+      <p class="det">${esc(it.detail||'No extra detail added.')}</p>
+      <div class="grid2">
+        <div class="stbox"><div class="k">Opportunity</div><div class="v" style="color:var(--red)">${FRICTION.score(it)}</div></div>
+        <div class="stbox"><div class="k">People feel it</div><div class="v">${it.votes}</div></div>
+        <div class="stbox"><div class="k">Time / week</div><div class="v">${fmtTime(it.minsPerWeek)}</div></div>
+        <div class="stbox"><div class="k">Raised by</div><div class="v" style="font-size:15px">${esc(it.who||'Anonymous')}</div></div>
+      </div>
+      <div class="aibox"><div class="k">◷ Possible AI fix</div><p>${esc(it.aiIdea || 'Not scoped yet. Good one to talk through at the monthly forum.')}</p></div>
+      <div class="statusrow" id="statusrow"></div>`;
+    const sr = document.getElementById('statusrow');
+    FRICTION.STATUSES.forEach(s=>{
+      const b=document.createElement('button'); b.className='stbtn'+(s===it.status?' on':''); b.textContent=s;
+      b.onclick=()=>{ it.status=s; FRICTION.save(items); renderPanelStats(it); render(); };
+      sr.appendChild(b);
+    });
+  }
+  document.getElementById('px').onclick = ()=>{ panel.classList.remove('open'); selId=null; render(); };
+
+  /* sort */
+  document.getElementById('sorts').addEventListener('click', e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    sort=b.dataset.sort; document.querySelectorAll('#sorts button').forEach(x=>x.classList.toggle('on',x===b)); render();
+  });
+
+  /* composer */
+  const scrim=document.getElementById('scrim'), compose=document.getElementById('compose');
+  const catSel=document.getElementById('f_cat');
+  Object.keys(FRICTION.CATEGORIES).forEach(c=>{const o=document.createElement('option');o.textContent=c;catSel.appendChild(o);});
+  function openC(){scrim.classList.add('show');compose.classList.add('show');document.getElementById('f_title').focus();}
+  function closeC(){scrim.classList.remove('show');compose.classList.remove('show');}
+  document.getElementById('addBtn').onclick=openC;
+  document.getElementById('f_cancel').onclick=closeC; scrim.onclick=closeC;
+  document.getElementById('f_save').onclick=()=>{
+    const t=document.getElementById('f_title').value.trim(); if(!t){document.getElementById('f_title').focus();return;}
+    items.push({
+      id:FRICTION.newId(), title:t, detail:document.getElementById('f_detail').value.trim(),
+      category:catSel.value, who:document.getElementById('f_who').value.trim()||'Anonymous',
+      minsPerWeek:parseInt(document.getElementById('f_mins').value)||30,
+      frequency:document.getElementById('f_freq').value, votes:1, status:'Raised',
+      aiIdea:''
+    });
+    voted.add(items[items.length-1].id); localStorage.setItem(votedKey,JSON.stringify([...voted]));
+    FRICTION.save(items); closeC();
+    ['f_title','f_detail','f_who'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f_mins').value=60;
+    sort='score'; document.querySelectorAll('#sorts button').forEach(x=>x.classList.toggle('on',x.dataset.sort==='score'));
+    render();
+  };
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeC();panel.classList.remove('open');selId=null;render();}});
+
+  function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  render();
+</script>
+</body>
+</html>
