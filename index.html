@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Friction — what's slowing us down</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23fe2458' stroke-width='5.7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
@@ -25,18 +26,21 @@
   .herowrap .ring{position:absolute;right:-120px;top:-130px;width:400px;height:400px;border-radius:50%;
     border:74px solid rgba(255,255,255,.05);pointer-events:none}
   .heroinner{max-width:1200px;margin:0 auto;padding:30px 22px 38px;position:relative;z-index:1}
-  .brand img{height:30px;display:block;margin-bottom:30px}
+  .brand img{height:46px;display:block;margin-bottom:30px}
   .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#cdbff2;font-weight:800;margin-bottom:13px}
   .herowrap h1{font-size:clamp(38px,6vw,64px);font-weight:900;letter-spacing:-.03em;line-height:.96}
   .herosub{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:18px}
   .herosub p{font-size:16px;font-weight:300;color:#d7cff0;max-width:470px;line-height:1.55}
   .herosub p b{color:#fff;font-weight:700}
-  /* rank toggle, styled for the navy hero */
-  .sorts{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+  /* rank toggle, styled for the navy hero — sliding pill that springs across */
+  .sorts{position:relative;display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
     border-radius:100px;padding:4px;flex:none}
-  .sorts button{border:0;background:transparent;font-family:inherit;font-weight:700;font-size:13px;color:#cdbff2;
-    padding:9px 16px;border-radius:100px;cursor:pointer;transition:.2s;white-space:nowrap}
-  .sorts button.on{background:#fff;color:var(--navy)}
+  .sorts .slider{position:absolute;top:4px;left:0;height:calc(100% - 8px);width:0;border-radius:100px;background:#fff;
+    transform:translateX(0);z-index:0;box-shadow:0 2px 8px rgba(0,0,0,.12);
+    transition:transform .46s cubic-bezier(.34,1.56,.64,1), width .46s cubic-bezier(.34,1.56,.64,1)}
+  .sorts button{position:relative;z-index:1;border:0;background:transparent;font-family:inherit;font-weight:700;font-size:13px;
+    color:#cdbff2;padding:9px 16px;border-radius:100px;cursor:pointer;transition:color .3s;white-space:nowrap}
+  .sorts button.on{color:var(--navy)}
 
   /* top priorities */
   .toplabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--charcoal);font-weight:800;margin:30px 0 14px}
@@ -122,6 +126,9 @@
   .stbtn{flex:1;min-width:70px;border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:700;font-size:12px;
     color:var(--charcoal);padding:9px 6px;border-radius:9px;cursor:pointer;transition:.2s}
   .stbtn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .delbtn{margin-top:24px;width:100%;border:1px solid var(--line);background:#fff;color:var(--charcoal);
+    font-family:inherit;font-weight:700;font-size:13px;padding:11px;border-radius:10px;cursor:pointer;transition:.2s}
+  .delbtn:hover{border-color:var(--red);color:var(--red);background:rgba(254,36,88,.04)}
 
   /* composer */
   .scrim{position:fixed;inset:0;background:rgba(26,20,48,.4);opacity:0;pointer-events:none;transition:.3s;z-index:50}
@@ -159,6 +166,7 @@
     <div class="herosub">
       <p>One shared list, ranked by impact, so we fix the things that <b>free the most time</b> instead of attacking problems at random.</p>
       <div class="sorts" id="sorts">
+        <span class="slider" id="sortSlider"></span>
         <button data-sort="score" class="on">Opportunity</button>
         <button data-sort="votes">Most felt</button>
         <button data-sort="time">Time lost</button>
@@ -301,13 +309,22 @@
         <div class="stbox"><div class="k">Raised by</div><div class="v" style="font-size:15px">${esc(it.who||'Anonymous')}</div></div>
       </div>
       <div class="aibox"><div class="k">◷ Possible AI fix</div><p>${esc(it.aiIdea||'Not scoped yet. Good one to talk through at the forum.')}</p></div>
-      <div class="pstatus"><div class="lab">Stage</div><div class="statusrow" id="statusrow"></div></div>`;
+      <div class="pstatus"><div class="lab">Stage</div><div class="statusrow" id="statusrow"></div></div>
+      <button class="delbtn" id="delBtn">Remove from board</button>`;
     const sr=document.getElementById('statusrow');
     FRICTION.STATUSES.forEach(s=>{
       const b=document.createElement('button'); b.className='stbtn'+(s===it.status?' on':''); b.textContent=s;
       b.onclick=()=>{ it.status=s; FRICTION.save(items); renderPanel(it); renderTop3(); renderBoard(); };
       sr.appendChild(b);
     });
+    document.getElementById('delBtn').onclick=()=>{
+      if(!confirm('Remove "'+it.title+'" from the board?')) return;
+      FRICTION.remove(it.id);
+      items=items.filter(x=>x.id!==it.id);
+      FRICTION.save(items);
+      panel.classList.remove('open'); selId=null;
+      renderTop3(); renderBoard();
+    };
   }
   document.getElementById('px').onclick=()=>{ panel.classList.remove('open'); selId=null; renderBoard(); };
 
@@ -332,12 +349,22 @@
     renderTop3(); setTimeout(renderBoard,260);
   }
 
-  // rank toggle
-  document.getElementById('sorts').addEventListener('click',e=>{
+  // rank toggle with a sliding pill that springs across
+  const sortsEl=document.getElementById('sorts'), slider=document.getElementById('sortSlider');
+  function positionSlider(){
+    const active=sortsEl.querySelector('button.on'); if(!active)return;
+    slider.style.width=active.offsetWidth+'px';
+    slider.style.transform='translateX('+active.offsetLeft+'px)';
+  }
+  sortsEl.addEventListener('click',e=>{
     const b=e.target.closest('button'); if(!b)return;
     sort=b.dataset.sort; document.querySelectorAll('#sorts button').forEach(x=>x.classList.toggle('on',x===b));
-    renderTop3(); renderBoard();
+    positionSlider(); renderTop3(); renderBoard();
   });
+  // place it once layout/fonts settle, and keep it right on resize
+  requestAnimationFrame(positionSlider);
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(positionSlider);}
+  window.addEventListener('resize',positionSlider);
 
   // composer
   const scrim=document.getElementById('scrim'),compose=document.getElementById('compose'),catSel=document.getElementById('f_cat');

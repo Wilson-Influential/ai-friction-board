@@ -121,18 +121,32 @@ const FRICTION = (() => {
     }
   ];
 
+  const DEL_KEY = 'friction_deleted_v1';
+  function loadDeleted() {
+    try { return new Set(JSON.parse(localStorage.getItem(DEL_KEY) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+
   function load() {
+    const del = loadDeleted();
+    let list;
     try {
       const raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return structuredClone(SEED);
-      const saved = JSON.parse(raw);
       // Merge: keep seed items current, append anything the user added.
       const seedById = Object.fromEntries(structuredClone(SEED).map(s => [s.id, s]));
-      for (const item of saved) seedById[item.id] = item;
-      return Object.values(seedById);
+      if (raw) { for (const item of JSON.parse(raw)) seedById[item.id] = item; }
+      list = Object.values(seedById);
     } catch (e) {
-      return structuredClone(SEED);
+      list = structuredClone(SEED);
     }
+    // Honour deletions (works for seeded items too, so they don't reappear).
+    return list.filter(x => !del.has(x.id));
+  }
+
+  // Mark an item deleted so it stays gone across reloads.
+  function remove(id) {
+    const d = loadDeleted(); d.add(id);
+    try { localStorage.setItem(DEL_KEY, JSON.stringify([...d])); } catch (e) {}
   }
 
   function save(list) {
@@ -150,5 +164,5 @@ const FRICTION = (() => {
 
   function newId() { return 'u' + Date.now().toString(36); }
 
-  return { CATEGORIES, STATUS_COLORS, STATUSES, SEED, load, save, score, newId, textOn, STORE_KEY };
+  return { CATEGORIES, STATUS_COLORS, STATUSES, SEED, load, save, remove, score, newId, textOn, STORE_KEY };
 })();
